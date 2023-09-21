@@ -13,9 +13,7 @@ public record DadosCadastroPagamento(
         @NotNull
         MetodoPagamento metodoPagamento,
         String numeroCartao,
-        @NotBlank
-        String valorPagamento,
         @NotNull
-        StatusPagamento status
+        String valorPagamento
 ) {
 }
