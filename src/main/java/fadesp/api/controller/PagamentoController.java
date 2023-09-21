@@ -34,7 +34,7 @@ public class PagamentoController {
             @RequestParam(value = "cpf_cnpj", required = false) String cpf_cnpj,
             @RequestParam(value = "status" ,required = false) String status
     ) {
-        return repository.findByCodigoDebito(codigo_debito);
+        return repository.findByStatus(status);
     }
 
     @PutMapping("/{id}")
