@@ -30,6 +30,11 @@ public class Pagamento {
         this.valor_pagamento = dados.valorPagamento();
         this.cpf_cnpj = dados.cpfCnpj();
         this.numero_cartao = dados.numeroCartao();
-        this.status = "Pendente de Processamento";
+        this.status = "PENDENTE_DE_PROCESSAMENTO";
+    }
+
+    public void atualizarStatus(DadosAtualizarStatusPagamento dados) {
+        if(dados.status() != null)
+            this.status = dados.status();
     }
 }
