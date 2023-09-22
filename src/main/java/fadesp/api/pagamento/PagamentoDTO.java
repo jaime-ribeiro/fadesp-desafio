@@ -1,42 +1,19 @@
 package fadesp.api.pagamento;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
-@Table(name = "pagamentos")
-@Entity(name = "Pagamento")
-@AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode(of = "id")
-public class Pagamento {
-
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class PagamentoDTO {
+    @NotBlank
     private String codigoDebito;
+    @NotBlank
     private String cpfCnpj;
-    @Enumerated(EnumType.STRING)
+    @NotNull
     private MetodoPagamento metodoPagamento;
     private String numeroCartao;
+    @NotNull
     private String valorPagamento;
-    @Enumerated(EnumType.STRING)
-    private StatusPagamento status;
-
-    public Pagamento(PagamentoDTO dados){
-        this.codigoDebito = dados.getCodigoDebito();
-        this.metodoPagamento = dados.getMetodoPagamento();
-        this.valorPagamento = dados.getValorPagamento();
-        this.cpfCnpj = dados.getCpfCnpj();
-        this.numeroCartao = dados.getNumeroCartao();
-        this.status = dados.getStatusPagamento();
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
+    private StatusPagamento statusPagamento;
 
     public String getCodigoDebito() {
         return codigoDebito;
@@ -77,12 +54,11 @@ public class Pagamento {
     public void setValorPagamento(String valorPagamento) {
         this.valorPagamento = valorPagamento;
     }
-
-    public StatusPagamento getStatus() {
-        return status;
+    public StatusPagamento getStatusPagamento() {
+        return statusPagamento;
     }
 
-    public void setStatus(StatusPagamento status) {
-        this.status = status;
+    public void setStatusPagamento(StatusPagamento statusPagamento) {
+        this.statusPagamento = statusPagamento;
     }
 }

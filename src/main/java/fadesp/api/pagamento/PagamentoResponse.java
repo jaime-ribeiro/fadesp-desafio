@@ -1,43 +1,25 @@
 package fadesp.api.pagamento;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 
-@Table(name = "pagamentos")
-@Entity(name = "Pagamento")
-@AllArgsConstructor
-@NoArgsConstructor
-@EqualsAndHashCode(of = "id")
-public class Pagamento {
-
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class PagamentoResponse {
     private String codigoDebito;
     private String cpfCnpj;
     @Enumerated(EnumType.STRING)
     private MetodoPagamento metodoPagamento;
     private String numeroCartao;
     private String valorPagamento;
-    @Enumerated(EnumType.STRING)
     private StatusPagamento status;
 
-    public Pagamento(PagamentoDTO dados){
-        this.codigoDebito = dados.getCodigoDebito();
-        this.metodoPagamento = dados.getMetodoPagamento();
-        this.valorPagamento = dados.getValorPagamento();
-        this.cpfCnpj = dados.getCpfCnpj();
-        this.numeroCartao = dados.getNumeroCartao();
-        this.status = dados.getStatusPagamento();
+    public PagamentoResponse(Pagamento pagamento){
+        this.codigoDebito = pagamento.getCodigoDebito();
+        this.cpfCnpj = pagamento.getCpfCnpj();
+        this.metodoPagamento = pagamento.getMetodoPagamento();
+        this.numeroCartao = pagamento.getNumeroCartao();
+        this.valorPagamento = pagamento.getValorPagamento();
+        this.status = pagamento.getStatus();
     }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public String getCodigoDebito() {
         return codigoDebito;
     }

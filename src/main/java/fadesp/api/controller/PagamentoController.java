@@ -1,81 +1,69 @@
 package fadesp.api.controller;
 
 
-import fadesp.api.pagamento.DadosAtualizarStatusPagamento;
-import fadesp.api.pagamento.DadosCadastroPagamento;
-import fadesp.api.pagamento.Pagamento;
-import fadesp.api.pagamento.PagamentoRepository;
-import jakarta.persistence.EntityNotFoundException;
+import fadesp.api.pagamento.*;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("pagamentos")
 public class PagamentoController {
 
-    @Autowired
-    private PagamentoRepository repository;
+    //@Autowired
+    //private PagamentoService PagamentoService;
+    private final PagamentoService pagamentoService;
+
+    public PagamentoController(PagamentoService pagamentoService) {
+        this.pagamentoService = pagamentoService;
+    }
+
     @PostMapping
     @Transactional
-    public void cadastrarPagamento(@RequestBody @Valid DadosCadastroPagamento dados) {
-        repository.save(new Pagamento(dados));
+    public PagamentoResponse cadastrarPagamento(@RequestBody @Valid PagamentoDTO pagamentoDTO) {
+        return pagamentoService.criarPagamento(pagamentoDTO);
     }
-
     @GetMapping
     public List<Pagamento> listarPagamentos() {
-        return repository.findAll();
+        return pagamentoService.buscarPagamentos();
     }
-    @GetMapping("/status")
-    public List<Pagamento> listarStatusPagamentos(
-            @RequestParam(value = "status" ) String status
-    ) {
-        return repository.findByStatus(status);
+    @GetMapping("/status/{status}")
+    public List<PagamentoResponse> listarStatusPagamentos(@PathVariable StatusPagamento status) {
+        return pagamentoService.buscarPagamentoStatus(status);
     }
 
-    @GetMapping("/codigoDebito")
+    @GetMapping("/codigoDebito/{codigoDebito}")
 
-    public List<Pagamento> ListarCodigoDebitoPagamentos(
-            @RequestParam(value = "codigoDebito") String codigoDebito
-    ) {
-        return repository.findByCodigoDebito(codigoDebito);
+    public List<PagamentoResponse> ListarCodigoDebitoPagamentos(@PathVariable String codigoDebito) {
+        return pagamentoService.buscarPagamentoCodigoDebito(codigoDebito);
     }
 
-    @GetMapping("/cpfCnpj")
-    public List<Pagamento> ListarCpfCnpjPagamentos(
-            @RequestParam(value = "cpfCnpj") String cpfCnpj
-    ) {
-        return repository.findByCpfCnpj(cpfCnpj);
+    @GetMapping("/cpfCnpj/{cpfCpnj}")
+    public List<PagamentoResponse> ListarCpfCnpjPagamentos(@PathVariable String cpfCnpj) {
+        return pagamentoService.buscarPagamentoCpfCnpj(cpfCnpj);
     }
 
     @PutMapping("/{id}")
     @Transactional
-    public void atualizarStatus(@PathVariable Long id, @RequestBody @Valid DadosAtualizarStatusPagamento dados){
-        var pagamento = repository.getReferenceById(id);
-        pagamento.atualizarStatus(dados);
+    public ResponseEntity<Object> atualizarStatus(@PathVariable Long id, @RequestBody @Valid NovoStatusPagamento statusPagamento){
+        if(pagamentoService.alterarPagamento(id, statusPagamento).equals("OK")){
+            return new ResponseEntity<>("OK", HttpStatus.OK);
+        }else{
+            return new ResponseEntity<>("ERRO, PAGAMENTO NÃO ENCONTRADO", HttpStatus.NOT_FOUND);
+        }
     }
-
 
     @DeleteMapping("/{id}")
     @Transactional
     public ResponseEntity<Object> apagarPagamento(@PathVariable Long id){
-        Optional<Pagamento>optionalPagamento = repository.findById(id);
-        if(optionalPagamento.isPresent()){
-            Pagamento pagamento = optionalPagamento.get();
-            var status = pagamento.getStatus();
-            if(status.equals("PENDENTE_DE_PROCESSAMENTO")){
-                repository.deleteById(id);
-                return new ResponseEntity<>("OK", HttpStatus.OK);
-            }
-            else {
-                return new ResponseEntity<>("O STATUS PRECISA SER PENDENTE_DE_PROCESSAMENTO PARA SER APAGADO", HttpStatus.FORBIDDEN);
-            }
+        if(pagamentoService.excluirPagamento(id).equals("OK")){
+            return new ResponseEntity<>("OK", HttpStatus.OK);
+        }else if(pagamentoService.excluirPagamento(id).equals("FORBIDDEN")){
+            return new ResponseEntity<>("O STATUS PRECISA SER PENDENTE_DE_PROCESSAMENTO PARA SER APAGADO", HttpStatus.FORBIDDEN);
         }else {
             return new ResponseEntity<>("ERRO, PAGAMENTO NÃO ENCONTRADO", HttpStatus.NOT_FOUND);
         }
